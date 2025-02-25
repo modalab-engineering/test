@@ -1,8 +1,8 @@
 install:
-	uv pip sync requirements.txt
+	uv pip install -r requirements.txt
 
 install-dev:
-	uv pip sync requirements-dev.txt
+	uv pip install -r requirements-dev.txt
 
 update-deps:
 	uv pip compile pyproject.toml --output-file requirements.txt

@@ -9,7 +9,12 @@ authors = [{name = "Modalab", email = "dev@modalab.com"}]
 requires-python = ">=3.10"
 version="0.0.1"
 dependencies = [
-    "python-dotenv"
+    "pandas",
+    "pillow",
+    "python-dotenv",
+    "qdrant-client",
+    "torch",
+    "transformers"
 ]
 
 [project.optional-dependencies]
