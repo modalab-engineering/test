@@ -1,4 +1,3 @@
-# TODO: Add input/output schema
 from pydantic import BaseModel, Field
 
 
