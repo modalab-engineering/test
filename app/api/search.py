@@ -11,7 +11,7 @@ router = APIRouter(
 
 async def _search(request: schemas.SearchRequest) -> list[schemas.Product]:
     result = await MODELS["search"].search(input=request)
-    return result
+    return result.products
 
 
 @router.post(
