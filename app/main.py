@@ -13,6 +13,8 @@ from config import ENV_VARIABLES
 from config.globals import MODELS
 from infrastructure.dependencies import init_dependencies
 
+from app.services import indexer
+
 ROOT_PATH = ENV_VARIABLES.get("ROOT_PATH", "local")
 
 
@@ -25,9 +27,23 @@ class CustomORJSONResponse(JSONResponse):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Inicializa las dependencias (por ejemplo, base de datos, Qdrant, etc.)
     init_dependencies()
     MODELS["search"] = SearchService()
-    yield
+    
+    # Inicia el scheduler del indexer y guárdalo para detenerlo al finalizar la app
+    try:
+        scheduler = indexer.start_indexing_job()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("Error al iniciar el indexer: %s", e)
+        scheduler = None
+
+    try:
+        yield
+    finally:
+        if scheduler:
+            scheduler.shutdown()
 
 
 app = FastAPI(
@@ -35,7 +51,6 @@ app = FastAPI(
     lifespan=lifespan,
     root_path=f"/{ROOT_PATH}" if ROOT_PATH != "local" else "",
 )
-
 
 app.include_router(api_router)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -56,4 +71,4 @@ async def root() -> str:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8002)  # noqa: S104
+    uvicorn.run(app, host="0.0.0.0", port=8002)

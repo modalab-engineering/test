@@ -33,3 +33,26 @@ def get_async_client():
             api_key=QDRANT_API_KEY,
         )
     return ASYNC_CLIENT_
+
+
+def get_existing_ids(client: qdrant_client.QdrantClient, collection_name: str) -> set:
+    existing_ids = set()
+    offset = None
+    limit = 100  
+
+    while True:
+        response = client.scroll(collection_name=collection_name, limit=limit, offset=offset)
+        result = response.result if hasattr(response, "result") else response.get("result", {})
+        points = result.get("points", [])
+        if not points:
+            break
+        for point in points:
+            existing_ids.add(point["id"])
+        offset = result.get("next_page_offset")
+        if not offset:
+            break
+
+    return existing_ids
+
+def upsert_points(client: qdrant_client.QdrantClient, collection_name: str, points: list):
+    return client.upsert(collection_name=collection_name, points=points)
