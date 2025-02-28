@@ -14,6 +14,7 @@ class Settings:
     # Aquí extraes la variable que necesitas; puedes definir un valor por defecto si lo deseas.
     MODALAB_DB_URL: str = ENV_VARIABLES.get("MODALAB_DB_URL", "")
     # Puedes agregar más variables si es necesario
+    QDRANT_COLLECTION: str = ENV_VARIABLES.get("COLLECTION_NAME", "modalab_products")
 
 # Instancia única de configuración para importar en otros módulos
 settings = Settings()
