@@ -122,7 +122,7 @@ streamlit==1.42.0
 
 tokenizers==0.21.0
     # via transformers
-torch==2.2.2
+torch==2.6.0
     # via search (pyproject.toml)
 tqdm==4.67.1
     # via
