@@ -65,7 +65,7 @@ text = st.text_input('Ingresa una descripción')
 if st.button('Buscar'):
     # Realizamos la búsqueda inicial para obtener una lista de IDs
     response = requests.post(
-        'https://ai.modalab.co/search/description',
+        'https://api.ai.modalab.co/search/description',
         json={'text': text, 'top_k': 10}
     )
     ids_data = response.json()
