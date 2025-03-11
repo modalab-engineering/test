@@ -78,8 +78,6 @@ def process_products():
     except Exception as e:
         logger.error("Error en el proceso de indexación: %s", e)
     finally:
-        client.close()
-        db.close()
         logger.info("Finalizado proceso de indexación.")
 
 def start_indexing_job():
