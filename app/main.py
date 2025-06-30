@@ -31,6 +31,17 @@ async def lifespan(app: FastAPI):
     init_dependencies()
     MODELS["search"] = SearchService()
     
+    # Ejecuta el proceso de indexación una vez al inicio
+    try:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info("Ejecutando la indexación inicial de productos al arranque...")
+        indexer.process_products()
+        logger.info("Indexación inicial de productos finalizada.")
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("Error durante la indexación inicial: %s", e)
+
     # Inicia el scheduler del indexer y guárdalo para detenerlo al finalizar la app
     try:
         scheduler = indexer.start_indexing_job()

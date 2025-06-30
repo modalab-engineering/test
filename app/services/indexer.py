@@ -47,12 +47,14 @@ def process_products():
     try:
         query = text("SELECT * FROM products")
         result = db.execute(query)
-        products = result.fetchall()
-        logger.info("Productos encontrados: %d", len(products))
+        
         existing_ids = get_existing_ids(client, collection_name)
-        logger.info("IDs existentes en Qdrant: %s", existing_ids)
+        logger.info("IDs existentes en Qdrant: %d", len(existing_ids))
 
-        for row in products:
+        product_count = 0
+        indexed_count = 0
+        for row in result:
+            product_count += 1
             product_data = dict(row._mapping)
             product_id = product_data.get("id")
             main_image_url = product_data.get("main_image")
@@ -64,7 +66,6 @@ def process_products():
                 continue
             try:
                 embedding = generate_image_embedding(main_image_url)
-                # Convertir el tensor a una lista de floats
                 embedding_list = np.array(embedding.detach().numpy()).flatten().tolist()
                 point = models.PointStruct(
                     id=product_id,
@@ -72,12 +73,16 @@ def process_products():
                     payload=product_data
                 )
                 client.upsert(collection_name=collection_name, points=[point])
+                indexed_count += 1
                 logger.info("Producto %s indexado en Qdrant.", product_id)
             except Exception as e:
                 logger.error("Error indexando producto %s: %s", product_id, e)
+
+        logger.info("Total de productos procesados: %d. Nuevos productos indexados: %d", product_count, indexed_count)
     except Exception as e:
         logger.error("Error en el proceso de indexación: %s", e)
     finally:
+        db.close()
         logger.info("Finalizado proceso de indexación.")
 
 def start_indexing_job():
