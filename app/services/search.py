@@ -27,7 +27,7 @@ class SearchService:
         text_embedding = await self.generate_text_embedding(input.text)
 
         search_result = self.client.search(
-            collection_name=ENV_VARIABLES["COLLECTION_NAME"],
+            collection_name=ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", ""),
             query_vector=text_embedding,
             limit=input.top_k,
         )

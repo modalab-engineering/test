@@ -10,11 +10,17 @@ ENV_VARIABLES = {
     **dotenv_values(dotenv_path=BASE_DIR / ".env"),
     **os.environ,
 }
+
+
 class Settings:
     # Aquí extraes la variable que necesitas; puedes definir un valor por defecto si lo deseas.
     MODALAB_DB_URL: str = ENV_VARIABLES.get("MODALAB_DB_URL", "")
-    # Puedes agregar más variables si es necesario
-    QDRANT_COLLECTION: str = ENV_VARIABLES.get("COLLECTION_NAME", "modalab_products")
+    # Configuración para Vertex AI
+    VERTEX_PROJECT: str = ENV_VARIABLES.get("VERTEX_PROJECT", "")
+    VERTEX_REGION: str = ENV_VARIABLES.get("VERTEX_REGION", "us-central1")
+    VERTEX_INDEX_ENDPOINT: str = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
+    VERTEX_DEPLOYED_INDEX_ID: str = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
+
 
 # Instancia única de configuración para importar en otros módulos
 settings = Settings()

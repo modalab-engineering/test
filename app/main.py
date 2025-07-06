@@ -8,12 +8,10 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api import api_router
-from app.services import SearchService
+from app.services import SearchService, indexer
 from config import ENV_VARIABLES
 from config.globals import MODELS
 from infrastructure.dependencies import init_dependencies
-
-from app.services import indexer
 
 ROOT_PATH = ENV_VARIABLES.get("ROOT_PATH", "local")
 
@@ -27,19 +25,21 @@ class CustomORJSONResponse(JSONResponse):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Inicializa las dependencias (por ejemplo, base de datos, Qdrant, etc.)
+    # Inicializa las dependencias (por ejemplo, base de datos, Vertex AI, etc.)
     init_dependencies()
     MODELS["search"] = SearchService()
-    
+
     # Ejecuta el proceso de indexación una vez al inicio
     try:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.info("Ejecutando la indexación inicial de productos al arranque...")
         indexer.process_products()
         logger.info("Indexación inicial de productos finalizada.")
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).error("Error durante la indexación inicial: %s", e)
 
     # Inicia el scheduler del indexer y guárdalo para detenerlo al finalizar la app
@@ -47,6 +47,7 @@ async def lifespan(app: FastAPI):
         scheduler = indexer.start_indexing_job()
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).error("Error al iniciar el indexer: %s", e)
         scheduler = None
 
