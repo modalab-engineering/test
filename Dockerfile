@@ -1,7 +1,7 @@
-FROM python:3.10-slim-buster
+FROM python:3.12-alpine
 
 # Instala dependencias del sistema necesarias para compilar paquetes Python
-RUN apt-get update && apt-get -y install gcc g++ python3-dev build-essential
+RUN apk add --no-cache gcc musl-dev postgresql-dev bash curl jq
 
 WORKDIR /program
 
