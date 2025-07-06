@@ -14,7 +14,7 @@ dependencies = [
     "pandas",
     "pillow",
     "python-dotenv",
-    "qdrant-client",
+    "google-cloud-aiplatform",
     "torch",
     "transformers",
     "uvicorn"

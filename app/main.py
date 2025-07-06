@@ -27,7 +27,7 @@ class CustomORJSONResponse(JSONResponse):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Inicializa las dependencias (por ejemplo, base de datos, Qdrant, etc.)
+    # Inicializa las dependencias (por ejemplo, base de datos, Vertex AI, etc.)
     init_dependencies()
     MODELS["search"] = SearchService()
     

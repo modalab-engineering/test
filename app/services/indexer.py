@@ -10,7 +10,6 @@ from io import BytesIO
 from PIL import Image
 import numpy as np
 from sqlalchemy import text
-from qdrant_client import models
 
 logger = logging.getLogger(__name__)
 
@@ -43,13 +42,13 @@ def process_products():
     logger.info("Iniciando proceso de indexación de productos...")
     db = SessionLocal()
     client = get_client()
-    collection_name = settings.QDRANT_COLLECTION
+    collection_name = settings.VERTEX_INDEX_ENDPOINT
     try:
         query = text("SELECT * FROM products")
         result = db.execute(query)
         
         existing_ids = get_existing_ids(client, collection_name)
-        logger.info("IDs existentes en Qdrant: %d", len(existing_ids))
+        logger.info("IDs existentes en Vertex: %d", len(existing_ids))
 
         product_count = 0
         indexed_count = 0
@@ -67,14 +66,14 @@ def process_products():
             try:
                 embedding = generate_image_embedding(main_image_url)
                 embedding_list = np.array(embedding.detach().numpy()).flatten().tolist()
-                point = models.PointStruct(
-                    id=product_id,
-                    vector=embedding_list,
-                    payload=product_data
-                )
+                point = {
+                    "id": product_id,
+                    "vector": embedding_list,
+                    "payload": product_data,
+                }
                 client.upsert(collection_name=collection_name, points=[point])
                 indexed_count += 1
-                logger.info("Producto %s indexado en Qdrant.", product_id)
+                logger.info("Producto %s indexado en Vertex.", product_id)
             except Exception as e:
                 logger.error("Error indexando producto %s: %s", product_id, e)
 

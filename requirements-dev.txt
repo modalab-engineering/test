@@ -42,9 +42,7 @@ fsspec==2025.2.0
 grpcio==1.70.0
     # via
     #   grpcio-tools
-    #   qdrant-client
 grpcio-tools==1.70.0
-    # via qdrant-client
 h11==0.14.0
     # via
     #   httpcore
@@ -56,7 +54,6 @@ hpack==4.1.0
 httpcore==1.0.7
     # via httpx
 httpx==0.28.1
-    # via qdrant-client
 huggingface-hub==0.29.1
     # via
     #   tokenizers
@@ -91,7 +88,6 @@ nodeenv==1.9.1
 numpy==2.2.3
     # via
     #   pandas
-    #   qdrant-client
     #   transformers
 orjson==3.10.15
     # via search (pyproject.toml)
@@ -114,7 +110,6 @@ platformdirs==4.3.6
 pluggy==1.5.0
     # via pytest
 portalocker==2.10.1
-    # via qdrant-client
 pre-commit==4.1.0
     # via search (pyproject.toml)
 protobuf==5.29.3
@@ -124,7 +119,6 @@ pycodestyle==2.12.1
 pydantic==2.10.6
     # via
     #   fastapi
-    #   qdrant-client
 pydantic-core==2.27.2
     # via pydantic
 pyflakes==3.2.0
@@ -142,7 +136,7 @@ pyyaml==6.0.2
     #   huggingface-hub
     #   pre-commit
     #   transformers
-qdrant-client==1.13.2
+google-cloud-aiplatform==1.101.0
     # via search (pyproject.toml)
 regex==2024.11.6
     # via transformers
@@ -186,7 +180,6 @@ tzdata==2025.1
     # via pandas
 urllib3==2.3.0
     # via
-    #   qdrant-client
     #   requests
 uvicorn==0.34.0
     # via search (pyproject.toml)

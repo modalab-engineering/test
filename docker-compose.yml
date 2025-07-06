@@ -8,10 +8,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - QDRANT_HOST_URL=https://fccdd73a-38b8-40b5-bccd-b9e9f5d4241b.us-east4-0.gcp.cloud.qdrant.io
-      - QDRANT_PORT=6333
-      - QDRANT_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.h11_oEkbIlXEhNuXvNp5nLfHp3soQZJLLVNZNVqzPJ4
-      - COLLECTION_NAME=modalab_products
+      - VERTEX_PROJECT=my-project
+      - VERTEX_REGION=us-central1
+      - VERTEX_INDEX_ENDPOINT=projects/123/locations/us-central1/indexEndpoints/456
+      - VERTEX_DEPLOYED_INDEX_ID=0
       - MODALAB_DB_URL="postgresql://postgres:o%5B%25Fs%3AX1pv4m%40yC%3A@35.237.172.87:5432/postgres"
 
   front:
