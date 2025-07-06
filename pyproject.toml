@@ -9,6 +9,7 @@ authors = [{name = "Modalab", email = "dev@modalab.com"}]
 requires-python = ">=3.10"
 version="0.0.1"
 dependencies = [
+    "APScheduler",
     "fastapi",
     "orjson",
     "pandas",
@@ -17,7 +18,9 @@ dependencies = [
     "google-cloud-aiplatform",
     "torch",
     "transformers",
-    "uvicorn"
+    "uvicorn",
+    "sqlalchemy",
+    "pydantic",
 ]
 
 [project.optional-dependencies]

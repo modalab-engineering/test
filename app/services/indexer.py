@@ -1,15 +1,17 @@
 import logging
+from io import BytesIO
+
+import numpy as np
+import requests
+import torch
 from apscheduler.schedulers.background import BackgroundScheduler
+from PIL import Image
+from sqlalchemy import text
+from transformers import CLIPModel, CLIPProcessor
+
 from config.config import settings
 from infrastructure.database import SessionLocal
 from infrastructure.dependencies.vector_db import get_client, get_existing_ids
-from transformers import CLIPProcessor, CLIPModel
-import torch
-import requests
-from io import BytesIO
-from PIL import Image
-import numpy as np
-from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,7 @@ try:
 except Exception as e:
     logger.error("Error al cargar CLIP model o processor: %s", e)
     raise e
+
 
 def generate_image_embedding(image_url: str):
     logger.info("Generando embedding para la imagen: %s", image_url)
@@ -38,6 +41,7 @@ def generate_image_embedding(image_url: str):
         logger.error("Error generando embedding para %s: %s", image_url, e)
         raise e
 
+
 def process_products():
     logger.info("Iniciando proceso de indexación de productos...")
     db = SessionLocal()
@@ -46,7 +50,7 @@ def process_products():
     try:
         query = text("SELECT * FROM products")
         result = db.execute(query)
-        
+
         existing_ids = get_existing_ids(client, collection_name)
         logger.info("IDs existentes en Vertex: %d", len(existing_ids))
 
@@ -77,16 +81,21 @@ def process_products():
             except Exception as e:
                 logger.error("Error indexando producto %s: %s", product_id, e)
 
-        logger.info("Total de productos procesados: %d. Nuevos productos indexados: %d", product_count, indexed_count)
+        logger.info(
+            "Total de productos procesados: %d. Nuevos productos indexados: %d",
+            product_count,
+            indexed_count,
+        )
     except Exception as e:
         logger.error("Error en el proceso de indexación: %s", e)
     finally:
         db.close()
         logger.info("Finalizado proceso de indexación.")
 
+
 def start_indexing_job():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(process_products, 'interval', hours=24)
+    scheduler.add_job(process_products, "interval", hours=24)
     scheduler.start()
     logger.info("Scheduler de indexación iniciado.")
     return scheduler  # Se retorna el scheduler para poder detenerlo en el shutdown
