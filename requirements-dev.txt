@@ -181,6 +181,8 @@ protobuf==6.31.1
     #   grpc-google-iam-v1
     #   grpcio-status
     #   proto-plus
+psycopg2-binary==2.9.10
+    # via search (pyproject.toml)
 pyasn1==0.6.1
     # via
     #   pyasn1-modules

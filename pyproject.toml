@@ -21,6 +21,7 @@ dependencies = [
     "uvicorn",
     "sqlalchemy",
     "pydantic",
+    "psycopg2-binary",
 ]
 
 [project.optional-dependencies]
