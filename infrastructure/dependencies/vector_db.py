@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from google.cloud import aiplatform
+from google.cloud import aiplatform_v1
 
 from config import ENV_VARIABLES
 
@@ -8,25 +8,40 @@ PROJECT_ID = ENV_VARIABLES.get("VERTEX_PROJECT", "")
 REGION = ENV_VARIABLES.get("VERTEX_REGION", "us-central1")
 INDEX_ENDPOINT = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
 DEPLOYED_INDEX_ID = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
+API_ENDPOINT = ENV_VARIABLES.get("VERTEX_API_ENDPOINT", "")
 
 CLIENT_ = None
 
 
 class VertexVectorDBClient:
     def __init__(self) -> None:
-        aiplatform.init(project=PROJECT_ID, location=REGION)
-        self.index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
-            index_endpoint_name=INDEX_ENDPOINT
+        client_options = {}
+        if API_ENDPOINT:
+            client_options["api_endpoint"] = API_ENDPOINT
+
+        self.match_client = aiplatform_v1.MatchServiceClient(
+            client_options=client_options or None,
+        )
+        self.index_client = aiplatform_v1.IndexServiceClient(
+            client_options=client_options or None,
         )
 
     def search(self, collection_name: str, query_vector: list[float], limit: int):
-        response = self.index_endpoint.match(
+        datapoint = aiplatform_v1.IndexDatapoint(feature_vector=query_vector)
+        query = aiplatform_v1.FindNeighborsRequest.Query(
+            datapoint=datapoint,
+            neighbor_count=limit,
+        )
+
+        request = aiplatform_v1.FindNeighborsRequest(
+            index_endpoint=INDEX_ENDPOINT,
             deployed_index_id=DEPLOYED_INDEX_ID,
-            queries=[query_vector],
-            num_neighbors=limit,
+            queries=[query],
             return_full_datapoint=True,
         )
-        neighbors = response[0].neighbors
+
+        response = self.match_client.find_neighbors(request=request)
+        neighbors = response.nearest_neighbors[0].neighbors
         results = []
         for neighbor in neighbors:
             payload = neighbor.datapoint.metadata or {}
@@ -37,15 +52,19 @@ class VertexVectorDBClient:
         datapoints = []
         for p in points:
             datapoints.append(
-                {
-                    "datapoint_id": str(p["id"]),
-                    "feature_vector": p["vector"],
-                    "metadata": p.get("payload", {}),
-                }
+                aiplatform_v1.IndexDatapoint(
+                    datapoint_id=str(p["id"]),
+                    feature_vector=p["vector"],
+                    metadata=p.get("payload", {}),
+                )
             )
-        self.index_endpoint.upsert_datapoints(
-            deployed_index_id=DEPLOYED_INDEX_ID, datapoints=datapoints
+
+        request = aiplatform_v1.UpsertDatapointsRequest(
+            index=collection_name,
+            datapoints=datapoints,
         )
+
+        self.index_client.upsert_datapoints(request=request)
 
 
 def get_client() -> VertexVectorDBClient:

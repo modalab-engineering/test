@@ -20,6 +20,7 @@ class Settings:
     VERTEX_REGION: str = ENV_VARIABLES.get("VERTEX_REGION", "us-central1")
     VERTEX_INDEX_ENDPOINT: str = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
     VERTEX_DEPLOYED_INDEX_ID: str = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
+    VERTEX_API_ENDPOINT: str = ENV_VARIABLES.get("VERTEX_API_ENDPOINT", "")
 
 
 # Instancia única de configuración para importar en otros módulos
