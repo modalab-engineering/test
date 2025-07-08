@@ -23,3 +23,12 @@ pre-commit:
 
 dev:
 	uvicorn app.main:app --reload
+
+build-docker:
+	docker build \
+		-f Dockerfile \
+        -t modalab_search .
+
+run-docker: build-docker
+	docker run --env-file .env \
+		-p 8000:8000 modalab_search
