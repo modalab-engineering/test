@@ -33,7 +33,7 @@ class SearchService:
         products = []
         for item in search_result:
             payload = item.payload
-            product = Product(id=str(payload.get("id", "")))
+            product = Product(id=payload)
             products.append(product)
 
         return SearchResponse(products=products)

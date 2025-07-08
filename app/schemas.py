@@ -15,7 +15,7 @@ class SearchByDescription(SearchRequest):
 
 
 class Product(BaseModel):
-    id: str = Field(description="Product ID", examples=["1234", "5678"])
+    id: str | int = Field(description="Product ID", examples=["1234", 5678])
 
 
 class SearchResponse(BaseModel):

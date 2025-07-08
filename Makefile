@@ -20,3 +20,6 @@ test:
 
 pre-commit:
 	pre-commit run --all-files
+
+dev:
+	uvicorn app.main:app --reload

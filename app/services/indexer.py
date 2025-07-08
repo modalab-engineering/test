@@ -66,7 +66,6 @@ def process_products():
                 logger.warning("Producto %s sin imagen principal", product_id)
                 continue
             if product_id in existing_ids:
-                logger.info("Producto %s ya indexado.", product_id)
                 continue
             try:
                 embedding = generate_image_embedding(main_image_url)
