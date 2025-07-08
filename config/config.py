@@ -22,6 +22,7 @@ class Settings:
     VERTEX_INDEX_ENDPOINT: str = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
     VERTEX_DEPLOYED_INDEX_ID: str = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
     VERTEX_API_ENDPOINT: str = ENV_VARIABLES.get("VERTEX_API_ENDPOINT", "")
+    ROOT_PATH: str = ENV_VARIABLES.get("Root path", "")
 
 
 # Instancia única de configuración para importar en otros módulos
