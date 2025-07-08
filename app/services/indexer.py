@@ -1,4 +1,3 @@
-import logging
 from io import BytesIO
 
 import numpy as np
@@ -9,11 +8,9 @@ from PIL import Image
 from sqlalchemy import text
 from transformers import CLIPModel, CLIPProcessor
 
-from config.config import settings
+from config.config import logger, settings
 from infrastructure.database import SessionLocal
 from infrastructure.dependencies.vector_db import get_client, get_existing_ids
-
-logger = logging.getLogger(__name__)
 
 logger.info("Cargando modelo CLIP y processor...")
 try:
@@ -29,7 +26,7 @@ except Exception as e:
 def generate_image_embedding(image_url: str):
     logger.info("Generando embedding para la imagen: %s", image_url)
     try:
-        response = requests.get(image_url, timeout=10)
+        response = requests.get(image_url.strip(), timeout=10)
         response.raise_for_status()
         img = Image.open(BytesIO(response.content)).convert("RGB")
         inputs = clip_processor(images=img, return_tensors="pt")
@@ -48,19 +45,23 @@ def process_products():
     client = get_client()
     collection_name = settings.VERTEX_INDEX_ENDPOINT
     try:
+        db.rollback()
         query = text("SELECT * FROM products")
         result = db.execute(query)
+        result = result.mappings().fetchall()
+        candidate_ids = [row["id"] for row in result]
 
-        existing_ids = get_existing_ids(client, collection_name)
+        unsaved, existing_ids = get_existing_ids(client, candidate_ids)
+
         logger.info("IDs existentes en Vertex: %d", len(existing_ids))
+        logger.info(f"Total ids to save: {unsaved}")
 
         product_count = 0
         indexed_count = 0
         for row in result:
             product_count += 1
-            product_data = dict(row._mapping)
-            product_id = product_data.get("id")
-            main_image_url = product_data.get("main_image")
+            product_id = row.get("id")
+            main_image_url = row.get("main_image")
             if not main_image_url:
                 logger.warning("Producto %s sin imagen principal", product_id)
                 continue
@@ -73,7 +74,6 @@ def process_products():
                 point = {
                     "id": product_id,
                     "vector": embedding_list,
-                    "payload": product_data,
                 }
                 client.upsert(collection_name=collection_name, points=[point])
                 indexed_count += 1

@@ -1,5 +1,8 @@
+import re
 from types import SimpleNamespace
+from typing import List, Set, Tuple
 
+from google.api_core import exceptions as gexc
 from google.cloud import aiplatform_v1
 
 from config import ENV_VARIABLES
@@ -10,7 +13,9 @@ INDEX_ENDPOINT = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
 DEPLOYED_INDEX_ID = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
 API_ENDPOINT = ENV_VARIABLES.get("VERTEX_API_ENDPOINT", "")
 
+
 CLIENT_ = None
+CHUNK_ = 1_000
 
 
 class VertexVectorDBClient:
@@ -19,14 +24,19 @@ class VertexVectorDBClient:
         if API_ENDPOINT:
             client_options["api_endpoint"] = API_ENDPOINT
 
+        match_client_options = {"api_endpoint": API_ENDPOINT}
+        endpoint_client_options = {
+            "api_endpoint": f"{REGION}-aiplatform.googleapis.com"
+        }
+
         self.match_client = aiplatform_v1.MatchServiceClient(
-            client_options=client_options or None,
+            client_options=match_client_options or None,
         )
         self.index_client = aiplatform_v1.IndexServiceClient(
-            client_options=client_options or None,
+            client_options=endpoint_client_options or None,
         )
 
-    def search(self, collection_name: str, query_vector: list[float], limit: int):
+    def search(self, query_vector: list[float], limit: int):
         datapoint = aiplatform_v1.IndexDatapoint(feature_vector=query_vector)
         query = aiplatform_v1.FindNeighborsRequest.Query(
             datapoint=datapoint,
@@ -44,8 +54,8 @@ class VertexVectorDBClient:
         neighbors = response.nearest_neighbors[0].neighbors
         results = []
         for neighbor in neighbors:
-            payload = neighbor.datapoint.metadata or {}
-            results.append(SimpleNamespace(payload=payload))
+            id_ = neighbor.datapoint.datapoint_id
+            results.append(SimpleNamespace(payload=int(id_)))
         return results
 
     def upsert(self, collection_name: str, points: list):
@@ -55,15 +65,12 @@ class VertexVectorDBClient:
                 aiplatform_v1.IndexDatapoint(
                     datapoint_id=str(p["id"]),
                     feature_vector=p["vector"],
-                    metadata=p.get("payload", {}),
                 )
             )
-
         request = aiplatform_v1.UpsertDatapointsRequest(
             index=collection_name,
             datapoints=datapoints,
         )
-
         self.index_client.upsert_datapoints(request=request)
 
 
@@ -78,9 +85,52 @@ def get_async_client() -> VertexVectorDBClient:
     return get_client()
 
 
-def get_existing_ids(client: VertexVectorDBClient, collection_name: str) -> set:
-    # Listing datapoints is not directly supported; return empty set
-    return set()
+def _parse_missing_ids(msg: str) -> Set[str]:
+    return set(re.findall(r"\d+", msg))
+
+
+def get_existing_ids(
+    client: VertexVectorDBClient,
+    candidate_ids: List[str],
+) -> Tuple[Set[str], Set[str]]:
+    unsaved: Set[str] = set()
+    saved: Set[str] = set()
+
+    for i in range(0, len(candidate_ids), CHUNK_):
+        batch = candidate_ids[i : i + CHUNK_]
+
+        queries = [
+            aiplatform_v1.FindNeighborsRequest.Query(
+                datapoint=aiplatform_v1.IndexDatapoint(datapoint_id=str(pid)),
+                neighbor_count=1,
+            )
+            for pid in batch
+        ]
+
+        request = aiplatform_v1.FindNeighborsRequest(
+            index_endpoint=INDEX_ENDPOINT,
+            deployed_index_id=DEPLOYED_INDEX_ID,
+            queries=queries,
+            return_full_datapoint=False,
+        )
+
+        try:
+            response = client.match_client.find_neighbors(request=request)
+
+            for pid, nn in zip(batch, response.nearest_neighbors):
+                if not nn.neighbors:
+                    unsaved.add(pid)
+
+        except gexc.NotFound as err:
+            missing_ids = _parse_missing_ids(err.message or "")
+            if missing_ids:
+                unsaved.update({int(id_str) for id_str in missing_ids})
+            else:
+                unsaved.update({int(pid) for pid in batch})
+
+    saved = {id for id in candidate_ids if id not in unsaved}
+
+    return unsaved, saved
 
 
 def upsert_points(client: VertexVectorDBClient, collection_name: str, points: list):

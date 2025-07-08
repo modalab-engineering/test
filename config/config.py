@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 
@@ -25,3 +26,13 @@ class Settings:
 
 # Instancia única de configuración para importar en otros módulos
 settings = Settings()
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    )
+    logger.addHandler(handler)
