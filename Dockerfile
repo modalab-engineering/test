@@ -25,11 +25,10 @@ RUN pip install --upgrade pip uv && \
 ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
 
 
-COPY helpers/download_model.py .
-RUN python download_model.py
-
 # Copia el resto del código de la aplicación
 COPY . .
+# COPY helpers/download_model.py .
+RUN python helpers/download_model.py
 
 
 ENV TRANSFORMERS_CACHE="/program/model_cache"
