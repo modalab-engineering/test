@@ -22,12 +22,14 @@ RUN pip install --upgrade pip uv && \
     uv pip install --system --no-cache -r requirements-dev.txt
 
 
+ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
+
+
 COPY helpers/download_model.py .
-RUN python download_model.py
+RUN python helpers/download_model.py
 
 # Copia el resto del código de la aplicación
 COPY . .
-ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
 
 
 ENV TRANSFORMERS_CACHE="/program/model_cache"
