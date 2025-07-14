@@ -27,7 +27,6 @@ ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
 
 # Copia el resto del código de la aplicación
 COPY . .
-# COPY helpers/download_model.py .
 RUN python helpers/download_model.py
 
 

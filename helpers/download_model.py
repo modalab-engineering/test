@@ -2,10 +2,10 @@ import os
 
 from transformers import CLIPModel, CLIPProcessor
 
-from config import settings
+# from config import settings
 
-MODEL_NAME = settings.MODEL_PATH
-CACHE_DIR = settings.CACHE_DIR
+MODEL_NAME = "openai/clip-vit-base-patch32"  # settings.MODEL_PATH
+CACHE_DIR = "./model_cache"  # settings.CACHE_DIR
 
 if not os.path.exists(CACHE_DIR):
     os.makedirs(CACHE_DIR)
