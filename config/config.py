@@ -29,6 +29,10 @@ class Settings(BaseSettings):
 
     # API
     ROOT_PATH: str = Field(default="dev", description="API environment")
+    MODEL_PATH: str = Field(
+        default="openai/clip-vit-base-patch32", description="Model path"
+    )
+    CACHE_DIR: str = Field(default="./model_cache", description="Model cache directoy")
 
     class Config:
         env_file = ".env"

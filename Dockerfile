@@ -21,10 +21,16 @@ RUN pip install --upgrade pip uv && \
     uv pip install --system --no-cache -r requirements.txt && \
     uv pip install --system --no-cache -r requirements-dev.txt
 
+
+COPY helpers/download_model.py .
+RUN python download_model.py
+
 # Copia el resto del código de la aplicación
 COPY . .
 ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
 
+
+ENV TRANSFORMERS_CACHE="/program/model_cache"
 # Expone el puerto 8080 para la aplicación
 EXPOSE 8080
 # Comando de inicio, uvicorn se instalará en el PATH global

@@ -2,13 +2,14 @@ import torch
 from transformers import CLIPModel, CLIPProcessor
 
 from app.schemas import Product, SearchByDescription, SearchResponse
+from config import settings
 from infrastructure.dependencies import get_vector_db_client
 
 
 class SearchService:
     def __init__(self):
-        self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-        self.model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        self.processor = CLIPProcessor.from_pretrained(settings.CACHE_DIR)
+        self.model = CLIPModel.from_pretrained(settings.CACHE_DIR)
         self.client = get_vector_db_client()
 
     async def generate_text_embedding(self, text: str):

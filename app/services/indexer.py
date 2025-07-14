@@ -14,8 +14,8 @@ from infrastructure.dependencies.vector_db import get_client, get_existing_ids
 
 logger.info("Cargando modelo CLIP y processor...")
 try:
-    clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-    clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    clip_model = CLIPModel.from_pretrained(settings.CACHE_DIR)
+    clip_processor = CLIPProcessor.from_pretrained(settings.CACHE_DIR)
     clip_model.eval()
     logger.info("Modelo CLIP y processor cargados correctamente.")
 except Exception as e:
