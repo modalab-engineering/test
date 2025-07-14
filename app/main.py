@@ -9,11 +9,11 @@ from fastapi.responses import JSONResponse
 
 from app.api import api_router
 from app.services import SearchService, indexer
-from config import ENV_VARIABLES
+from config import settings
 from config.globals import MODELS
 from infrastructure.dependencies import init_dependencies
 
-ROOT_PATH = ENV_VARIABLES.get("ROOT_PATH", "local")
+ROOT_PATH = settings.ROOT_PATH
 
 
 class CustomORJSONResponse(JSONResponse):

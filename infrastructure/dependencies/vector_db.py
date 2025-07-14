@@ -5,13 +5,13 @@ from typing import List, Set, Tuple
 from google.api_core import exceptions as gexc
 from google.cloud import aiplatform_v1
 
-from config import ENV_VARIABLES
+from config import settings
 
-PROJECT_ID = ENV_VARIABLES.get("VERTEX_PROJECT", "")
-REGION = ENV_VARIABLES.get("VERTEX_REGION", "us-central1")
-INDEX_ENDPOINT = ENV_VARIABLES.get("VERTEX_INDEX_ENDPOINT", "")
-DEPLOYED_INDEX_ID = ENV_VARIABLES.get("VERTEX_DEPLOYED_INDEX_ID", "")
-API_ENDPOINT = ENV_VARIABLES.get("VERTEX_API_ENDPOINT", "")
+PROJECT_ID = settings.VERTEX_PROJECT
+REGION = settings.VERTEX_REGION
+INDEX_ENDPOINT = settings.VERTEX_INDEX_ENDPOINT
+DEPLOYED_INDEX_ID = settings.VERTEX_DEPLOYED_INDEX_ID
+API_ENDPOINT = settings.VERTEX_API_ENDPOINT
 
 
 CLIENT_ = None

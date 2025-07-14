@@ -1,1 +1,1 @@
-from .config import ENV_VARIABLES
+from .config import settings

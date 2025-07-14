@@ -16,11 +16,13 @@ dependencies = [
     "pillow",
     "python-dotenv",
     "google-cloud-aiplatform",
+    "cloud-sql-python-connector[pg8000]",
     "torch",
     "transformers",
     "uvicorn",
     "sqlalchemy",
     "pydantic",
+    "pydantic-settings",
     "psycopg2-binary",
 ]
 
