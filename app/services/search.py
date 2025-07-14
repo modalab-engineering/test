@@ -8,8 +8,12 @@ from infrastructure.dependencies import get_vector_db_client
 
 class SearchService:
     def __init__(self):
-        self.processor = CLIPProcessor.from_pretrained(settings.CACHE_DIR)
-        self.model = CLIPModel.from_pretrained(settings.CACHE_DIR)
+        self.processor = CLIPProcessor.from_pretrained(
+            settings.MODEL_PATH, cache_dir=settings.CACHE_DIR
+        )
+        self.model = CLIPModel.from_pretrained(
+            settings.MODEL_PATH, cache_dir=settings.CACHE_DIR
+        )
         self.client = get_vector_db_client()
 
     async def generate_text_embedding(self, text: str):
