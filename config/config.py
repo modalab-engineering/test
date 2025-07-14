@@ -12,7 +12,7 @@ DATA_DIR = BASE_DIR / "data"
 class Settings(BaseSettings):
     # DB
     MODALAB_DB_URL: Optional[str] = None
-    INSTANCE_CONNECTION_NAME = Optional[str] = None
+    INSTANCE_CONNECTION_NAME: Optional[str] = None
     DB_USER: Optional[str] = None
     DB_PASS: Optional[str] = None
     DB_NAME: Optional[str] = None
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
         ..., description="Vertex deployed index id (streaming)"
     )
     VERTEX_API_ENDPOINT: str = Field(..., description="Vertex API endpoint")
+    PRIVATE_IP: bool = Field(False)
 
     # API
     ROOT_PATH: str = Field(default="dev", description="API environment")
