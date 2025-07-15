@@ -36,11 +36,22 @@ class VertexVectorDBClient:
             client_options=endpoint_client_options or None,
         )
 
-    def search(self, query_vector: list[float], limit: int):
+    def search(
+        self, query_vector: list[float], limit: int, followed_stores: List[int] = None
+    ):
         datapoint = aiplatform_v1.IndexDatapoint(feature_vector=query_vector)
+
+        query_filter = None
+        if followed_stores:
+            string_followed_stores = [str(store_id) for store_id in followed_stores]
+            query_filter = aiplatform_v1.IndexDatapoint.Restriction(
+                namespace="store_id", allow_list=string_followed_stores
+            )
+
         query = aiplatform_v1.FindNeighborsRequest.Query(
             datapoint=datapoint,
             neighbor_count=limit,
+            restricts=[query_filter] if query_filter else [],
         )
 
         request = aiplatform_v1.FindNeighborsRequest(
@@ -58,13 +69,18 @@ class VertexVectorDBClient:
             results.append(SimpleNamespace(payload=int(id_)))
         return results
 
-    def upsert(self, collection_name: str, points: list):
+    def upsert(self, collection_name: str, points: list, store_id: int):
         datapoints = []
         for p in points:
             datapoints.append(
                 aiplatform_v1.IndexDatapoint(
                     datapoint_id=str(p["id"]),
                     feature_vector=p["vector"],
+                    restricts=[
+                        aiplatform_v1.IndexDatapoint.Restriction(
+                            namespace="store_id", allow_list=[str(store_id)]
+                        )
+                    ],
                 )
             )
         request = aiplatform_v1.UpsertDatapointsRequest(

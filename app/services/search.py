@@ -33,6 +33,7 @@ class SearchService:
         search_result = self.client.search(
             query_vector=text_embedding,
             limit=input.top_k,
+            followed_stores=input.followed_stores,
         )
 
         products = []

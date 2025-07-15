@@ -66,6 +66,7 @@ def process_products():
             product_count += 1
             product_id = row.get("id")
             main_image_url = row.get("main_image")
+            store_id = row.get("designer_id")
             if not main_image_url:
                 logger.warning("Producto %s sin imagen principal", product_id)
                 continue
@@ -78,7 +79,9 @@ def process_products():
                     "id": product_id,
                     "vector": embedding_list,
                 }
-                client.upsert(collection_name=collection_name, points=[point])
+                client.upsert(
+                    collection_name=collection_name, points=[point], store_id=store_id
+                )
                 indexed_count += 1
                 logger.info("Producto %s indexado en Vertex.", product_id)
             except Exception as e:

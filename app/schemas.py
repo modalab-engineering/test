@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, Field
 
 
@@ -11,6 +13,9 @@ class SearchByDescription(SearchRequest):
     text: str = Field(
         description="Text to search for.",
         examples=["Crochet bags", "Statement earrings", "Red dress"],
+    )
+    followed_stores: List[int] = Field(
+        default=None, description="Followd client stores"
     )
 
 
