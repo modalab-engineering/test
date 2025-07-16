@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,9 @@ class SearchByDescription(SearchRequest):
 
 class Product(BaseModel):
     id: str | int = Field(description="Product ID", examples=["1234", 5678])
+    similarity_score: Optional[float] = Field(
+        default=None, description="Similarity score (distance) from the query vector"
+    )
 
 
 class SearchResponse(BaseModel):

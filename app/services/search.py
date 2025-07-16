@@ -39,7 +39,7 @@ class SearchService:
         products = []
         for item in search_result:
             payload = item.payload
-            product = Product(id=payload)
+            product = Product(id=payload, similarity_score=item.similarity_score)
             products.append(product)
 
         return SearchResponse(products=products)

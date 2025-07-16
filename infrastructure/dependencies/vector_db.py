@@ -68,7 +68,8 @@ class VertexVectorDBClient:
         results = []
         for neighbor in neighbors:
             id_ = neighbor.datapoint.datapoint_id
-            results.append(SimpleNamespace(payload=int(id_)))
+            distance = neighbor.distance
+            results.append(SimpleNamespace(payload=int(id_), similarity_score=distance))
         return results
 
     def upsert(self, collection_name: str, points: list, store_id: int):
