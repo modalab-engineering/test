@@ -48,8 +48,8 @@ async def search_image_url(
 )
 async def search_image(
     image: Annotated[bytes, File(..., description="Image file")],
-    top_k: Annotated[int, Form(25)] = 25,
-    followed_stores: Annotated[List[int] | None, Form(None)] = None,
+    top_k: Annotated[int, Form()] = 25,
+    followed_stores: Annotated[List[int] | None, Form()] = [],
 ) -> list[schemas.Product]:
     """Search for products by uploading an image."""
     request = schemas.SearchByImage(top_k=top_k, followed_stores=followed_stores)
