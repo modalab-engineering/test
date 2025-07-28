@@ -24,6 +24,7 @@ dependencies = [
     "pydantic",
     "pydantic-settings",
     "psycopg2-binary",
+    "python-multipart",
 ]
 
 [project.optional-dependencies]
