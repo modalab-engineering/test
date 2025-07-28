@@ -19,6 +19,24 @@ class SearchByDescription(SearchRequest):
     )
 
 
+class SearchByImageUrl(SearchRequest):
+    url: str = Field(
+        description="URL that points directly to an image.",
+    )
+    followed_stores: List[int] = Field(
+        default=None, description="Followd client stores"
+    )
+
+
+class SearchByImage(SearchRequest):
+    image: bytes | None = Field(
+        default=None, description="Binary image content (for documentation only)"
+    )
+    followed_stores: List[int] = Field(
+        default=None, description="Followd client stores"
+    )
+
+
 class Product(BaseModel):
     id: str | int = Field(description="Product ID", examples=["1234", 5678])
     similarity_score: Optional[float] = Field(
